@@ -35,6 +35,8 @@ invoke --collection=escodoo preparedb-escodoo --dbname=devel_br --createdb
 
 ## Iniciando Ambiente e Acessando o Odoo
 ```
+invoke git-aggregate
+invoke img-build
 invoke start
 ```
 

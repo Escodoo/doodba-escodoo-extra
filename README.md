@@ -18,7 +18,7 @@ deactivate
 
 ## Tarefas Escodoo e Preparação da Base
 
-## Listando as ações disponíveis:
+### Listando as ações disponíveis:
 ```
 invoke --collection=escodoo --list 
 ```

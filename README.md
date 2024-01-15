@@ -2,12 +2,12 @@
 
 Abra o terminal shell e dentro da pasta do projeto Doodba execute o processo abaixo
 
-# Adicionando Tarefas Escodoo
+## Adicionando Tarefas Escodoo
 ```
 wget -O escodoo.py 'https://raw.githubusercontent.com/Escodoo/doodba-escodoo-extra/main/escodoo.py?token=GHSAT0AAAAAACF2PHAN4732ULZOQQQ3EEVYZNFLH5A'
 ```
 
-# Preparando Ambiente
+## Preparando Ambiente
 
 ```
 INVOKE_VENV_PATH=$(pipx environment --value PIPX_LOCAL_VENVS)
@@ -16,9 +16,9 @@ python -m pip install requests
 deactivate
 ```
 
-# Tarefas Escodoo e Preparação da Base
+## Tarefas Escodoo e Preparação da Base
 
-### Listando as ações disponíveis:
+## Listando as ações disponíveis:
 ```
 invoke --collection=escodoo --list 
 ```
@@ -32,3 +32,10 @@ invoke --collection=escodoo overwrite-project-files --github-url=https://github.
 ```
 invoke --collection=escodoo preparedb-escodoo --dbname=devel_br --createdb
 ```
+
+## Iniciando Ambiente e Acessando o Odoo
+```
+invoke start
+```
+
+Abra o navegador e acesse `http://localhost:14069` (se for Odoo 16.0 acesse pela por 16069)

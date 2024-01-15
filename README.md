@@ -1,6 +1,6 @@
-# doodba-escodoo-extra
+# Doodba Escodoo Extra
 
-Abra o terminal shell e dentro da pasta do projeto doodba execute o processo abaixo
+Abra o terminal shell e dentro da pasta do projeto Doodba execute o processo abaixo
 
 # Adicionando Tarefas Escodoo
 ```

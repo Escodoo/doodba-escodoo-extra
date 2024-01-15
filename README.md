@@ -38,4 +38,4 @@ invoke --collection=escodoo preparedb-escodoo --dbname=devel_br --createdb
 invoke start
 ```
 
-Abra o navegador e acesse `http://localhost:14069` (se for Odoo 16.0 acesse pela por 16069)
+Abra o navegador e acesse `http://localhost:14069` (se for Odoo 16.0 acesse pela por 16069) e selecione a base de dados que foi criada anteriormente caso tenha passado o parametro --dbname na tarefa preparedb-escodoo.

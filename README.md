@@ -2,6 +2,11 @@
 
 Abra o terminal shell e dentro da pasta do projeto Doodba execute o processo abaixo
 
+## Iniciando ambiente de desenvolvimento
+```
+invoke develop
+```
+
 ## Adicionando Tarefas Escodoo
 ```
 wget -O escodoo.py 'https://raw.githubusercontent.com/Escodoo/doodba-escodoo-extra/main/escodoo.py?token=GHSAT0AAAAAACF2PHAN4732ULZOQQQ3EEVYZNFLH5A'

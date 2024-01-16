@@ -35,13 +35,13 @@ invoke --collection=escodoo overwrite-project-files --github-url=https://github.
 
 ### Criando e preparando a base de dados Escodoo
 ```
+invoke git-aggregate
+invoke img-build
 invoke --collection=escodoo preparedb-escodoo --dbname=devel_br --createdb
 ```
 
 ## Iniciando Ambiente e Acessando o Odoo
 ```
-invoke git-aggregate
-invoke img-build
 invoke start
 ```
 

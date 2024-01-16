@@ -9,7 +9,7 @@ invoke develop
 
 ## Adicionando Tarefas Escodoo
 ```
-wget -O escodoo.py https://github.com/Escodoo/doodba-escodoo-extra/blob/e799334c71be1fbd6fe4e406fea0fe98150aada5/escodoo.py
+wget -O escodoo.py https://raw.githubusercontent.com/Escodoo/doodba-escodoo-extra/main/escodoo.py
 ```
 
 ## Preparando Ambiente

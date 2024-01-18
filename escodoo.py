@@ -114,7 +114,7 @@ def preparedb_escodoo(c, dbname="devel", createdb=False):
                 pty=True,
             )
         c.run(
-            f"{_run} -d {dbname} -i escodoo_setup_base --stop-after-init",
+            f"{_run} -d {dbname} -i escodoo_setup_base --load-language=pt_BR --stop-after-init",
             env=UID_ENV,
             pty=True,
         )

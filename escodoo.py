@@ -167,23 +167,24 @@ def prepare_db(c, dbname="devel", demo=False, no_demo=False,
               "--stop-after-init", env=UID_ENV, pty=True)
 
 
-@task(help={"branch": "GitHub repository branch. Default: 'main'."})
-def update(c, branch="main"):
+@task(help={
+    "branch": "GitHub repository branch. Default: 'main'.",
+    "repo_url": "URL of the GitHub repository. Default: 'https://github.com/Escodoo/doodba-escodoo-extra'.",
+    "collection_name": "Name of the invoke collection. Default: 'escodoo'."
+})
+def update(c, branch="main", repo_url="https://github.com/Escodoo/doodba-escodoo-extra", collection_name="escodoo"):
     """
-    Updates the Escodoo invoke collection to the latest version from the specified GitHub repository branch.
+    Updates the specified invoke collection to the latest version from the given GitHub repository branch.
 
-    This task fetches the latest version of the invoke collection scripts from the Escodoo repository,
+    This task fetches the latest version of the invoke collection scripts,
     ensuring that the local setup remains aligned with the latest developments and best practices.
     It also creates a backup of the current scripts with a timestamp, before performing the update,
     to safeguard against any potential issues that might arise from the update.
     """
-
-    script_url = transform_github_url_to_raw_url(
-        "https://github.com/Escodoo/doodba-escodoo-extra", branch, "escodoo.py"
-    )
+    script_url = transform_github_url_to_raw_url(repo_url, branch, f"{collection_name}.py")
     new_script_content = download_file(script_url)
     if new_script_content:
-        script_path = PROJECT_ROOT / "escodoo.py"
+        script_path = PROJECT_ROOT / f"{collection_name}.py"
 
         # Read current script content
         with open(script_path, 'r') as file:
@@ -191,23 +192,23 @@ def update(c, branch="main"):
 
         # Check if the content is the same
         if current_script_content == new_script_content:
-            print("The escodoo.py script is already up to date.")
+            print(f"The {collection_name}.py script is already up to date.")
             return
 
         # If content is different, backup the current script
         timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-        backup_script_path = PROJECT_ROOT / f"escodoo.py.{timestamp}"
+        backup_script_path = PROJECT_ROOT / f"{collection_name}.{timestamp}.py"
         os.rename(script_path, backup_script_path)
         print(f"Backup of the current script saved as: {backup_script_path}")
 
         # Update the script with the new content
         with open(script_path, 'w') as file:
             file.write(new_script_content)
-        print("The escodoo.py script has been updated to the latest version.")
+        print(f"The {collection_name}.py script has been updated to the latest version.")
 
         # Instructions to delete the backup file
         print("\nTo delete the backup file:")
         print(f"Linux/Mac: rm {backup_script_path}")
         print(f"Windows: del {backup_script_path}")
     else:
-        print("Failed to update escodoo.py. Please check the URL or your internet connection.")
+        print("Failed to update. Please check the URL or your internet connection.")

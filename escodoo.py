@@ -170,9 +170,14 @@ def prepare_db(c, dbname="devel", demo=False, no_demo=False,
 @task(help={"branch": "GitHub repository branch. Default: 'main'."})
 def update(c, branch="main"):
     """
-    Updates the escodoo.py script to the latest version from the GitHub repository.
-    Saves a backup copy of the current script with a timestamp, if an update is needed.
+    Updates the Escodoo invoke collection to the latest version from the specified GitHub repository branch.
+
+    This task fetches the latest version of the invoke collection scripts from the Escodoo repository,
+    ensuring that the local setup remains aligned with the latest developments and best practices.
+    It also creates a backup of the current scripts with a timestamp, before performing the update,
+    to safeguard against any potential issues that might arise from the update.
     """
+
     script_url = transform_github_url_to_raw_url(
         "https://github.com/Escodoo/doodba-escodoo-extra", branch, "escodoo.py"
     )

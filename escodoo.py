@@ -5,8 +5,11 @@ This file is to be executed with https://www.pyinvoke.org/ in Python 3.6+.
 Contains common helpers to develop using this child project.
 """
 import os
+import subprocess
+import sys
 from logging import getLogger
 from pathlib import Path
+from datetime import datetime
 
 from invoke import exceptions, task
 
@@ -17,10 +20,44 @@ except ImportError:
 
 _logger = getLogger(__name__)
 
+
+def get_invoke_venv_path():
+    """Obtém o caminho do ambiente virtual do invoke gerenciado pelo pipx."""
+    try:
+        result = subprocess.run(
+            ["pipx", "environment", "--value", "PIPX_LOCAL_VENVS"],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        pipx_venv_root = Path(result.stdout.strip())
+        invoke_venv_path = pipx_venv_root / "invoke" / "bin"
+        return invoke_venv_path
+    except subprocess.CalledProcessError:
+        print("Não foi possível obter o caminho do ambiente virtual do invoke.")
+        return None
+
+
+def install_package_in_venv(venv_path, package):
+    """Instala um pacote no ambiente virtual especificado."""
+    python_executable = venv_path / "python"  # Caminho para o Python no ambiente virtual do invoke
+    try:
+        subprocess.check_call([python_executable, "-m", "pip", "install", package])
+    except subprocess.CalledProcessError:
+        print(f"Failed to install {package} in the virtual environment.")
+
+
 try:
     import requests
-except (ImportError, IOError) as err:
-    _logger.debug(err)
+except ImportError:
+    print("Installing 'requests' module in the invoke virtual environment...")
+    invoke_venv_path = get_invoke_venv_path()
+    if invoke_venv_path and invoke_venv_path.exists():
+        install_package_in_venv(invoke_venv_path, "requests")
+        import requests  # Tenta importar novamente após a instalação
+    else:
+        print("Invoke virtual environment path not found.")
+        sys.exit(1)
 
 PROJECT_ROOT = Path(__file__).parent.absolute()
 SRC_PATH = PROJECT_ROOT / "odoo" / "custom" / "src"
@@ -91,6 +128,7 @@ def overwrite_project_files(c, github_url):
 
     print("Update Escodoo config files is done!")
 
+
 @task(help={
     "dbname": "The DB if exits that will be DESTROYED and recreated. Default: 'devel'.",
     "demo": "Use --demo to force install demo data.",
@@ -160,3 +198,38 @@ def preparedb_escodoo(c, dbname="devel", demo=False, no_demo=False, extra_module
     # A justificativa de ter o modulo escodoo_setup_base é para que seja um padrão independente de que pais vamos implantar
     # o Odoo. Então teremos uma versão base para qq pais e um modulo como o escodoo_setup_base_br para o Brasil e podemos ter outros
     # modulos como escodoo_setup_base_ar para a Argentina, escodoo_setup_base_mx para o México, etc.
+
+
+@task(help={"branch": "Branch of the GitHub repository to download the script from. Default: 'main'."})
+def update_script(c, branch="main"):
+    """
+    Update the escodoo.py script with the latest version from the GitHub repository.
+    Saves a backup copy of the current script with a timestamp before updating.
+    """
+    script_url = transform_github_url_to_raw_url(
+        "https://github.com/Escodoo/doodba-escodoo-extra",
+        branch,
+        "escodoo.py"
+    )
+    new_script_content = download_file(script_url)
+    if new_script_content is not None:
+        script_path = PROJECT_ROOT / "escodoo.py"
+
+        # Save a backup of the current script with timestamp
+        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+        backup_script_path = PROJECT_ROOT / f"escodoo.py.{timestamp}"
+        os.rename(script_path, backup_script_path)
+        print(f"Backup of the current script saved as: {backup_script_path}")
+
+        # Update the script with the new content
+        with open(script_path, 'w') as file:
+            file.write(new_script_content)
+        print("The escodoo.py script has been updated to the latest version.")
+
+        # Instructions to delete the backup file
+        print("\nTo delete the backup file, use one of the following commands:")
+        print(f"Linux/Mac: rm {backup_script_path}")
+        print(f"Windows: del {backup_script_path}")
+    else:
+        print("Failed to update the escodoo.py script. Please check the URL or your internet connection.")
+

@@ -125,46 +125,51 @@ def get_template_files(c, github_url="https://github.com/Escodoo/doodba-escodoo-
 
 @task(help={
     "dbname": "Database name to be DESTROYED and recreated. Default: 'devel'.",
-    "extra_modules": "Extra modules to install (comma-separated). Default: ''",
+    "init_modules": "Modules to install during database initialization (comma-separated). Default: 'escodoo_setup_base'.",
+    "extra_modules": "Extra modules to install after initial setup (comma-separated). Default: 'escodoo_setup_base_br'. Specify --extra_modules='' to skip.",
     "language": "Language code for database initialization (e.g., 'pt_BR', 'en_US'). "
-                "Defaults to the system's Odoo language, typically English, "
-                "or to the 'load_language' parameter in odoo.conf, if specified.",
-    "demo": "Use --demo to install demo data. "
-            "This will overwrite the environment's demo data definition.",
-    "no_demo": "Use --no-demo to exclude demo data. "
-               "This will overwrite the environment's demo data definition.",
+                "Defaults to the system's Odoo language or 'load_language' in odoo.conf.",
+    "demo": "Use demo to install demo data, overwriting the environment's definition.",
+    "no_demo": "Use no-demo to exclude demo data, overwriting the environment's definition.",
 })
 def prepare_db(c, dbname="devel", demo=False, no_demo=False,
-               extra_modules='', language=None):
+               init_modules='escodoo_setup_base', extra_modules='escodoo_setup_base_br',
+               language=None):
     """
-    Prepares the Escodoo database in two steps.
+    Prepares the Escodoo database in multiple steps.
 
-    Initially, sets up an Odoo database for Escodoo by installing
-    escodoo_setup_base with a specified language. Then, installs
-    escodoo_setup_base_br and any additional modules provided.
-    Utilizes docker-compose for managing Odoo containers and
-    performs database operations like dropping and installing databases.
+    Sets up an Odoo database for Escodoo by installing specified modules during
+    database initialization. Optionally, additional modules are installed in a
+    subsequent step if provided. Utilizes docker-compose for managing Odoo containers
+    and performs database operations like dropping and installing databases.
     """
     if ODOO_VERSION < 11:
         raise exceptions.PlatformError(
-            "Preparedb_escodoo script not available for Doodba below v11."
+            "Prepare_db script not available for Doodba below v11."
         )
     c.run("docker-compose stop odoo", pty=True)
     _run = "docker-compose run --rm -l traefik.enable=false odoo"
 
     with c.cd(str(PROJECT_ROOT)):
-        demo_param = "--without-demo=ALL" if no_demo else \
-                     ("--without-demo=False" if demo else "")
-        language_param = f"--load-language={language}" \
-                         if language else ""
+        demo_param = "--without-demo=ALL" if no_demo else "--without-demo=False" if demo else ""
+        language_param = f"--load-language={language}" if language else ""
 
-        c.run(f"{_run} click-odoo-dropdb {dbname}", env=UID_ENV, warn=True, pty=True)
-        c.run(f"{_run} -d {dbname} -i escodoo_setup_base {demo_param} "
-              f"{language_param} --stop-after-init", env=UID_ENV, pty=True)
+        # Drop the database if it exists
+        c.run(f"docker-compose run --rm odoo click-odoo-dropdb --if-exists {dbname}", env=UID_ENV, warn=True, pty=True)
 
-        extra_modules_param = ',' + extra_modules if extra_modules else ''
-        c.run(f"{_run} -d {dbname} -i escodoo_setup_base_br{extra_modules_param} "
-              "--stop-after-init", env=UID_ENV, pty=True)
+        # Initialize the database with initial modules
+        c.run(f"{_run} -d {dbname} -i {init_modules} {demo_param} {language_param} --stop-after-init",
+              env=UID_ENV, pty=True)
+
+        # Install extra modules after initial setup, if specified and not empty
+        if extra_modules.strip():
+            c.run(f"{_run} -d {dbname} -i {extra_modules} --stop-after-init",
+                  env=UID_ENV, pty=True)
+            print(f"Extra modules installed: {extra_modules}")
+        else:
+            print("No extra modules specified for installation.")
+
+        print(f"Database {dbname} prepared with initial modules.")
 
 
 @task(help={

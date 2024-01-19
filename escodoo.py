@@ -94,8 +94,9 @@ def download_file(url):
 
 
 @task(help={"github_url": "URL of the GitHub repository"})
-def overwrite_project_files(c, github_url):
-    """Overwrites local files with template remote files."""
+def get_project_files(c, github_url):
+    """Overwrites or creates local files with remote template files (addons.yaml, repos.yaml,
+    apt.txt, gem.txt, npm.txt, and pip.txt) from a specified GitHub repository."""
     odoo_version = str(int(ODOO_VERSION))
     files_to_update = {
         "repos.yaml": "odoo/custom/src/repos.yaml",
@@ -128,8 +129,8 @@ def overwrite_project_files(c, github_url):
     "no_demo": "Use --no-demo to exclude demo data. "
                "This will overwrite the environment's demo data definition.",
 })
-def preparedb_escodoo(c, dbname="devel", demo=False, no_demo=False,
-                      extra_modules='', language=None):
+def prepare_db(c, dbname="devel", demo=False, no_demo=False,
+               extra_modules='', language=None):
     """
     Prepares the Escodoo database in two steps.
 
@@ -162,7 +163,7 @@ def preparedb_escodoo(c, dbname="devel", demo=False, no_demo=False,
 
 
 @task(help={"branch": "GitHub repository branch. Default: 'main'."})
-def update_script(c, branch="main"):
+def update(c, branch="main"):
     """
     Updates the escodoo.py script to the latest version from the GitHub repository.
     Saves a backup copy of the current script with a timestamp, if an update is needed.

@@ -201,3 +201,4 @@ def update_script(c, branch="main"):
     else:
         print("Failed to update escodoo.py. Please check the URL or your internet connection.")
 
+#teste

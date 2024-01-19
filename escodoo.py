@@ -93,10 +93,15 @@ def download_file(url):
         return None
 
 
-@task(help={"github_url": "URL of the GitHub repository"})
-def get_template_files(c, github_url):
-    """Overwrites or creates local files with remote template files (addons.yaml, repos.yaml,
-    apt.txt, gem.txt, npm.txt, and pip.txt) from a specified GitHub repository."""
+@task(help={"github_url": "URL of the GitHub repository. Default: "
+                          "https://github.com/Escodoo/doodba-escodoo-setup-br"})
+def get_template_files(c, github_url="https://github.com/Escodoo/doodba-escodoo-setup-br"):
+    """Get remote template files (addons.yaml, repos.yaml, pip.txt and others) for Odoo setup.
+
+    This task downloads and updates local configuration files
+    with the versions from the specified GitHub repository. It's essential for
+    setting up Odoo with the necessary dependencies and custom configurations.
+    """
     odoo_version = str(int(ODOO_VERSION))
     files_to_update = {
         "repos.yaml": "odoo/custom/src/repos.yaml",
@@ -115,7 +120,7 @@ def get_template_files(c, github_url):
                 file.write(content)
             print(f"File updated: {file_name}")
 
-    print("Escodoo config files update completed.")
+    print("Files update completed.")
 
 
 @task(help={

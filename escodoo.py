@@ -200,5 +200,3 @@ def update_script(c, branch="main"):
         print(f"Windows: del {backup_script_path}")
     else:
         print("Failed to update escodoo.py. Please check the URL or your internet connection.")
-
-#teste

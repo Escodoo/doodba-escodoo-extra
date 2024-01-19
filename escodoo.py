@@ -94,7 +94,7 @@ def download_file(url):
 
 
 @task(help={"github_url": "URL of the GitHub repository"})
-def get_project_files(c, github_url):
+def get_template_files(c, github_url):
     """Overwrites or creates local files with remote template files (addons.yaml, repos.yaml,
     apt.txt, gem.txt, npm.txt, and pip.txt) from a specified GitHub repository."""
     odoo_version = str(int(ODOO_VERSION))

@@ -165,7 +165,7 @@ def preparedb_escodoo(c, dbname="devel", demo=False, no_demo=False,
 def update_script(c, branch="main"):
     """
     Updates the escodoo.py script to the latest version from the GitHub repository.
-    Saves a backup copy of the current script with a timestamp.
+    Saves a backup copy of the current script with a timestamp, if an update is needed.
     """
     script_url = transform_github_url_to_raw_url(
         "https://github.com/Escodoo/doodba-escodoo-extra", branch, "escodoo.py"
@@ -173,17 +173,31 @@ def update_script(c, branch="main"):
     new_script_content = download_file(script_url)
     if new_script_content:
         script_path = PROJECT_ROOT / "escodoo.py"
+
+        # Read current script content
+        with open(script_path, 'r') as file:
+            current_script_content = file.read()
+
+        # Check if the content is the same
+        if current_script_content == new_script_content:
+            print("The escodoo.py script is already up to date.")
+            return
+
+        # If content is different, backup the current script
         timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
         backup_script_path = PROJECT_ROOT / f"escodoo.py.{timestamp}"
         os.rename(script_path, backup_script_path)
-        print(f"Backup saved as: {backup_script_path}")
+        print(f"Backup of the current script saved as: {backup_script_path}")
 
+        # Update the script with the new content
         with open(script_path, 'w') as file:
             file.write(new_script_content)
-        print("escodoo.py script updated.")
+        print("The escodoo.py script has been updated to the latest version.")
 
+        # Instructions to delete the backup file
         print("\nTo delete the backup file:")
         print(f"Linux/Mac: rm {backup_script_path}")
         print(f"Windows: del {backup_script_path}")
     else:
-        print("Failed to update escodoo.py. Check URL or internet connection.")
+        print("Failed to update escodoo.py. Please check the URL or your internet connection.")
+

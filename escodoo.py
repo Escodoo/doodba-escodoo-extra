@@ -93,16 +93,19 @@ def download_file(url):
         return None
 
 
-@task(help={"github_url": "URL of the GitHub repository. Default: "
-                          "https://github.com/Escodoo/doodba-escodoo-setup-br"})
-def get_template_files(c, github_url="https://github.com/Escodoo/doodba-escodoo-setup-br"):
-    """Get remote template files (addons.yaml, repos.yaml, pip.txt and others) for Odoo setup.
+@task(help={
+    "github_url": "URL of the GitHub repository. Default: 'https://github.com/Escodoo/doodba-escodoo-setup-br'.",
+    "force_branch": "Force a specific branch to be used instead of the Odoo version. Default: False."
+})
+def get_template_files(c, github_url="https://github.com/Escodoo/doodba-escodoo-setup-br", force_branch=False):
+    """
+    Get remote template files (addons.yaml, repos.yaml, pip.txt, and others) for Odoo setup.
 
     This task downloads and updates local configuration files
     with the versions from the specified GitHub repository. It's essential for
     setting up Odoo with the necessary dependencies and custom configurations.
     """
-    odoo_version = str(int(ODOO_VERSION))
+    branch = force_branch if force_branch else f"{str(int(ODOO_VERSION))}.0"
     files_to_update = {
         "repos.yaml": "odoo/custom/src/repos.yaml",
         "addons.yaml": "odoo/custom/src/addons.yaml",
@@ -112,7 +115,7 @@ def get_template_files(c, github_url="https://github.com/Escodoo/doodba-escodoo-
         "pip.txt": "odoo/custom/dependencies/pip.txt",
     }
     for file_name, file_path in files_to_update.items():
-        url = transform_github_url_to_raw_url(github_url, f"{odoo_version}.0", file_path)
+        url = transform_github_url_to_raw_url(github_url, branch, file_path)
         content = download_file(url)
         if content:
             local_path = PROJECT_ROOT / file_path

@@ -172,8 +172,14 @@ def prepare_db(c, dbname="devel", demo=False, no_demo=False,
         else:
             print("No extra modules specified for installation.")
 
-        print(f"Database {dbname} prepared with initial modules.")
+        # Run the `preparedb` script inside the container to prepare the database with initial data
+        c.run(
+            "docker-compose run --rm -l traefik.enable=false odoo preparedb -d {dbname}",
+            env=UID_ENV,
+            pty=True,
+        )
 
+        print(f"Database {dbname} is prepared and ready to launch.")
 
 @task(help={
     "branch": "GitHub repository branch. Default: 'main'.",

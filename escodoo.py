@@ -173,8 +173,7 @@ def prepare_db(c, dbname="devel", demo=False, no_demo=False,
             print("No extra modules specified for installation.")
 
         # Run the `preparedb` script inside the container to prepare the database with initial data
-        c.run(
-            "docker-compose run --rm -l traefik.enable=false odoo preparedb -d {dbname}",
+        c.run(f"docker-compose run --rm -l traefik.enable=false odoo preparedb -d {dbname}",
             env=UID_ENV,
             pty=True,
         )

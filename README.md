@@ -1,6 +1,6 @@
 # Doodba Escodoo Extra
 
-## Baxiando a Invoke Collection
+## Baixando a Invoke Collection
 Partindo do princípio que seu projeto Doodba está disponível, abra o terminal shell e, dentro da pasta do projeto Doodba, execute o processo abaixo para baixar o script `escodoo.py`:
 
 ```

@@ -26,6 +26,7 @@ invoke --collection=escodoo get_template_files
 
 Opções:
 - github_url: URL do repositório GitHub. Padrão: https://github.com/Escodoo/doodba-escodoo-setup-br.
+- - force_branch: Permite forçar a branch de onde deve copiar os arquivos. Por padrão a tarefa assume a versão do Odoo
 
 ### Tarefa: prepare_db
 

@@ -113,6 +113,10 @@ def get_template_files(c, github_url="https://github.com/Escodoo/doodba-escodoo-
         "gem.txt": "odoo/custom/dependencies/gem.txt",
         "npm.txt": "odoo/custom/dependencies/npm.txt",
         "pip.txt": "odoo/custom/dependencies/pip.txt",
+        "00-boleto_cnab_api.conf": "odoo/custom/conf.d/00-boleto_cnab_api.conf",
+        "01-auth_admin_passkey.conf": "odoo/custom/conf.d/01-auth_admin_passkey.conf",
+        "02-load_language.conf": "odoo/custom/conf.d/02-load_language.conf",
+        "03-queue_job.conf": "odoo/custom/conf.d/03-queue_job.conf",
     }
     for file_name, file_path in files_to_update.items():
         url = transform_github_url_to_raw_url(github_url, branch, file_path)

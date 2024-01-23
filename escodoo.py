@@ -218,27 +218,26 @@ def get_template_files(c, github_url="https://github.com/Escodoo/doodba-escodoo-
 @task(help={
     "dbname": "Database name to be DESTROYED and recreated. Default: 'devel'.",
     "init_modules": "Modules to install during database initialization (comma-separated). Default: 'escodoo_setup_base'.",
-    "extra_modules": "Extra modules to install after initial setup (comma-separated). Default: 'escodoo_setup_base_br'. Specify --extra_modules='' to skip.",
-    "language": "Language code for database initialization (e.g., 'pt_BR', 'en_US'). "
-                "Defaults to the system's Odoo language or 'load_language' in odoo.conf.",
-    "demo": "Use demo to install demo data, overwriting the environment's definition.",
-    "no_demo": "Use no-demo to exclude demo data, overwriting the environment's definition.",
+    "post_init_modules": "Modules to install after database initialization, typically localization modules (comma-separated). Default: 'escodoo_setup_base_br'.",
+    "extra_modules": "Extra modules to install after post-initial setup (comma-separated). Leave empty or set to False to skip.",
+    "language": "Language code for database initialization (e.g., 'pt_BR', 'en_US'). Defaults to the system's Odoo language or 'load_language' in odoo.conf.",
+    "demo": "Use demo data. Overwrites the environment's definition.",
+    "no_demo": "Exclude demo data. Overwrites the environment's definition.",
 })
 def prepare_db(c, dbname="devel", demo=False, no_demo=False,
-               init_modules='escodoo_setup_base', extra_modules='escodoo_setup_base_br',
-               language=None):
+               init_modules='escodoo_setup_base', 
+               post_init_modules='escodoo_setup_base_br', 
+               extra_modules=False, language=None):
     """
     Prepares the Escodoo database in multiple steps.
 
-    Sets up an Odoo database for Escodoo by installing specified modules during
-    database initialization. Optionally, additional modules are installed in a
-    subsequent step if provided. Utilizes docker-compose for managing Odoo containers
-    and performs database operations like dropping and installing databases.
+    Sets up an Odoo database by installing specified modules during database initialization. 
+    Additional modules can be installed in subsequent steps if provided.
+    Utilizes docker-compose for managing Odoo containers and performs database operations.
     """
     if ODOO_VERSION < 11:
-        raise exceptions.PlatformError(
-            "Prepare_db script not available for Doodba below v11."
-        )
+        raise exceptions.PlatformError("Prepare_db script not available for Doodba below v11.")
+
     c.run("docker-compose stop odoo", pty=True)
     _run = "docker-compose run --rm -l traefik.enable=false odoo"
 
@@ -253,8 +252,12 @@ def prepare_db(c, dbname="devel", demo=False, no_demo=False,
         c.run(f"{_run} -d {dbname} -i {init_modules} {demo_param} {language_param} --stop-after-init",
               env=UID_ENV, pty=True)
 
-        # Install extra modules after initial setup, if specified and not empty
-        if extra_modules.strip():
+        # Install post-initialization modules, typically localization modules
+        c.run(f"{_run} -d {dbname} -i {post_init_modules} --stop-after-init",
+              env=UID_ENV, pty=True)
+
+        # Install extra modules after initial setup, if specified
+        if extra_modules and extra_modules.strip():
             c.run(f"{_run} -d {dbname} -i {extra_modules} --stop-after-init",
                   env=UID_ENV, pty=True)
             print(f"Extra modules installed: {extra_modules}")
@@ -268,6 +271,7 @@ def prepare_db(c, dbname="devel", demo=False, no_demo=False,
         )
 
         print(f"Database {dbname} is prepared and ready to launch.")
+
 
 @task(help={
     "branch": "GitHub repository branch. Default: 'main'.",

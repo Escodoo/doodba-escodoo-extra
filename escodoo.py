@@ -6,6 +6,8 @@ Contains common helpers to develop using this child project.
 import os
 import subprocess
 import sys
+import random
+import string
 from datetime import datetime
 from logging import getLogger
 from pathlib import Path
@@ -91,6 +93,43 @@ def download_file(url):
         return response.text
     except requests.RequestException:
         return None
+
+
+def generate_random_password(length=48):
+    """Generate a password similar to a token, using a mix of upper and lower case letters and numbers."""
+    characters = string.ascii_letters + string.digits  # Combina letras e números
+    return ''.join(random.choice(characters) for i in range(length))
+
+
+@task(help={
+    "env_file_path": "Path to the Odoo environment file. Default: '.docker/odoo.env'."
+})
+def prepare_auth_admin_passkey_config(c, env_file_path=".docker/odoo.env"):
+    """
+    Prepares the auth_admin_passkey module parameters.
+
+    This task checks the specified Odoo environment file for the existence of the
+    'AUTH_ADMIN_PASSKEY_PASSWORD' line. If it is not found, the task inserts the line
+    with a randomly generated password.
+    """
+    env_file = Path(env_file_path)
+    if not env_file.exists():
+        print(f"Environment file not found: {env_file_path}")
+        return
+
+    with open(env_file, "r") as file:
+        lines = file.readlines()
+
+    # Check if the 'AUTH_ADMIN_PASSKEY_PASSWORD' is already in the file
+    key = "AUTH_ADMIN_PASSKEY_PASSWORD="
+    if any(key in line for line in lines):
+        print("AUTH_ADMIN_PASSKEY_PASSWORD is already set in the environment file.")
+    else:
+        # Generate a random password and add it to the file
+        random_password = generate_random_password()
+        with open(env_file, "a") as file:
+            file.write(f"{key}{random_password}\n")
+        print(f"Added AUTH_ADMIN_PASSKEY_PASSWORD to {env_file_path}")
 
 
 @task(help={

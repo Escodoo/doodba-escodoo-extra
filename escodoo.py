@@ -154,6 +154,7 @@ def get_template_files(c, github_url="https://github.com/Escodoo/doodba-escodoo-
         "pip.txt": "odoo/custom/dependencies/pip.txt",
         "00-escodoo_base.conf": "odoo/custom/conf.d/00-escodoo_base.conf",
         "01-queue_job.conf": "odoo/custom/conf.d/01-queue_job.conf",
+        "02-auth_admin_passkey.conf": "odoo/custom/conf.d/02-auth_admin_passkey.conf",
     }
     for file_name, file_path in files_to_update.items():
         url = transform_github_url_to_raw_url(github_url, branch, file_path)

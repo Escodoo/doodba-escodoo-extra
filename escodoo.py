@@ -104,32 +104,79 @@ def generate_random_password(length=48):
 @task(help={
     "env_file_path": "Path to the Odoo environment file. Default: '.docker/odoo.env'."
 })
-def prepare_auth_admin_passkey_config(c, env_file_path=".docker/odoo.env"):
+def set_admin_password(c, env_file_path=".docker/odoo.env"):
     """
-    Prepares the auth_admin_passkey module parameters.
+    Sets or updates the ADMIN_PASSWORD in the specified Odoo environment file.
 
-    This task checks the specified Odoo environment file for the existence of the
-    'AUTH_ADMIN_PASSKEY_PASSWORD' line. If it is not found, the task inserts the line
-    with a randomly generated password.
+    This task checks for the 'ADMIN_PASSWORD' line in the environment file.
+    If it exists, the password is updated; if not, a new password line is added.
     """
     env_file = Path(env_file_path)
     if not env_file.exists():
         print(f"Environment file not found: {env_file_path}")
         return
 
+    key = "ADMIN_PASSWORD="
+    password_line = None
+    new_password = generate_random_password()
+    
     with open(env_file, "r") as file:
         lines = file.readlines()
 
-    # Check if the 'AUTH_ADMIN_PASSKEY_PASSWORD' is already in the file
-    key = "AUTH_ADMIN_PASSKEY_PASSWORD="
-    if any(key in line for line in lines):
-        print("AUTH_ADMIN_PASSKEY_PASSWORD is already set in the environment file.")
+    # Check if 'ADMIN_PASSWORD' exists and replace or append
+    for i, line in enumerate(lines):
+        if line.startswith(key):
+            password_line = i
+            break
+
+    if password_line is not None:
+        lines[password_line] = f"{key}{new_password}\n"
+        print("Updated ADMIN_PASSWORD in the environment file.")
     else:
-        # Generate a random password and add it to the file
-        random_password = generate_random_password()
-        with open(env_file, "a") as file:
-            file.write(f"{key}{random_password}\n")
+        lines.append(f"{key}{new_password}\n")
+        print(f"Added ADMIN_PASSWORD to {env_file_path}")
+
+    with open(env_file, "w") as file:
+        file.writelines(lines)
+
+
+@task(help={
+    "env_file_path": "Path to the Odoo environment file. Default: '.docker/odoo.env'."
+})
+def set_auth_admin_passkey_password(c, env_file_path=".docker/odoo.env"):
+    """
+    Sets or updates the AUTH_ADMIN_PASSKEY_PASSWORD in the specified Odoo environment file.
+
+    This task checks for the 'AUTH_ADMIN_PASSKEY_PASSWORD' line in the environment file.
+    If it exists, the password is updated; if not, a new password line is added.
+    """
+    env_file = Path(env_file_path)
+    if not env_file.exists():
+        print(f"Environment file not found: {env_file_path}")
+        return
+
+    key = "AUTH_ADMIN_PASSKEY_PASSWORD="
+    password_line = None
+    new_password = generate_random_password()
+    
+    with open(env_file, "r") as file:
+        lines = file.readlines()
+
+    # Check if 'AUTH_ADMIN_PASSKEY_PASSWORD' exists and replace or append
+    for i, line in enumerate(lines):
+        if line.startswith(key):
+            password_line = i
+            break
+
+    if password_line is not None:
+        lines[password_line] = f"{key}{new_password}\n"
+        print("Updated AUTH_ADMIN_PASSKEY_PASSWORD in the environment file.")
+    else:
+        lines.append(f"{key}{new_password}\n")
         print(f"Added AUTH_ADMIN_PASSKEY_PASSWORD to {env_file_path}")
+
+    with open(env_file, "w") as file:
+        file.writelines(lines)
 
 
 @task(help={

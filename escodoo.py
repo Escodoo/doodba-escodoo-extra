@@ -180,6 +180,43 @@ def set_auth_admin_passkey_password(c, env_file_path=".docker/odoo.env"):
 
 
 @task(help={
+    "env_file_path": "Path to the Odoo environment file. Default: '.docker/odoo.env'."
+})
+def set_demo_data(c, env_file_path=".docker/odoo.env"):
+    """
+    Sets the DOODBA_WITHOUT_DEMO variable in the Odoo environment file to False.
+
+    This task ensures that demo data is included during the database setup.
+    """
+    env_file = Path(env_file_path)
+    if not env_file.exists():
+        print(f"Environment file not found: {env_file_path}")
+        return
+
+    key = "DOODBA_WITHOUT_DEMO="
+    demo_line = None
+
+    with open(env_file, "r") as file:
+        lines = file.readlines()
+
+    # Check if 'DOODBA_WITHOUT_DEMO' exists and replace or append
+    for i, line in enumerate(lines):
+        if line.startswith(key):
+            demo_line = i
+            break
+
+    if demo_line is not None:
+        lines[demo_line] = f"{key}False\n"
+        print("Updated DOODBA_WITHOUT_DEMO in the environment file.")
+    else:
+        lines.append(f"{key}False\n")
+        print(f"Added DOODBA_WITHOUT_DEMO to {env_file_path}")
+
+    with open(env_file, "w") as file:
+        file.writelines(lines)
+
+
+@task(help={
     "github_url": "URL of the GitHub repository. Default: 'https://github.com/Escodoo/doodba-escodoo-setup-br'.",
     "force_branch": "Force a specific branch to be used instead of the Odoo version. Default: False."
 })

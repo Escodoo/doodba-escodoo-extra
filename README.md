@@ -1,6 +1,6 @@
-# Escodoo Python Invoke Tasks for Doodba Odoo Project Management
+# Escodoo Python Invoke Tasks for Doodba Project Management
 
-This README provides details on the `escodoo.py` script, containing tasks for development and management of Doodba Odoo projects, executed using `invoke`.
+This README provides details on the `escodoo.py` script, containing tasks for development and management of Doodba projects, executed using `invoke`.
 
 ## Downloading the Invoke Collection
 

@@ -218,9 +218,9 @@ def set_demo_data(c, env_file_path=".docker/odoo.env"):
 
 @task(help={
     "github_url": "URL of the GitHub repository. Default: 'https://github.com/Escodoo/doodba-escodoo-setup-br'.",
-    "force_branch": "Force a specific branch to be used instead of the Odoo version. Default: False."
+    "force_branch": "Force a specific branch to be used instead of the Odoo version. Default: Doodba Odoo Version."
 })
-def get_template_files(c, github_url="https://github.com/Escodoo/doodba-escodoo-setup-br", force_branch=False):
+def get_template_files(c, github_url="https://github.com/Escodoo/doodba-escodoo-setup-br", force_branch=None):
     """
     Get remote template files (addons.yaml, repos.yaml, pip.txt, and others) for Odoo setup.
 

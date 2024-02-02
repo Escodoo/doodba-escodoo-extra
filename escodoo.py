@@ -289,15 +289,14 @@ def prepare_db(c, dbname="devel", demo=False, no_demo=False,
         c.run(f"{_run} -d {dbname} -i {init_modules} {demo_param} {language_param} --stop-after-init",
               env=UID_ENV, pty=True)
 
-        # Install post-initialization modules, typically localization modules
-        c.run(f"{_run} -d {dbname} -i {post_init_modules} --stop-after-init",
-              env=UID_ENV, pty=True)
+        # Install post-initialization modules, but only if they are specified
+        if post_init_modules.strip():
+            c.run(f"{_run} -d {dbname} -i {post_init_modules} --stop-after-init",
+                  env=UID_ENV, pty=True)
 
         # Run the `preparedb` script inside the container to prepare the database with initial data
         c.run(f"docker-compose run --rm -l traefik.enable=false odoo preparedb -d {dbname}",
-            env=UID_ENV,
-            pty=True,
-        )
+              env=UID_ENV, pty=True)
 
         # Install extra modules after initial setup, if specified
         if extra_modules:
@@ -307,6 +306,7 @@ def prepare_db(c, dbname="devel", demo=False, no_demo=False,
                 print(f"Extra modules installed: {extra_modules}")
             except Exception as e:
                 print(f"Failed to install extra modules: {e}\nAll other steps completed successfully. Extra modules can be installed directly through the Odoo interface.")
+
 
 @task(help={
     "branch": "GitHub repository branch. Default: 'main'.",
